@@ -15,6 +15,23 @@ To make it work you need:
 - capstone
 - elf++/dwarf++
 
+#### External dependencies
+```
+sudp apt install libcapstone-dev
+sudo apt install binutils-dev
+sudo apt install libreadline-dev
+```
+
+#### Libelfin dependency
+Make sure you pulled this repository with the included git submodule libelfin
+Building libelfin and exporting library path
+
+```
+cd ./external/libelfin
+make install
+export LD_LIBRARY_PATH=/usr/local/lib
+```
+
 ### Installing
 
 To compile the project:
