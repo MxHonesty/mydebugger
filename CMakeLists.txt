@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD 17)
 PROJECT(${MYGDB} CXX)
 
 ADD_EXECUTABLE(${MYGDB} src/main.cc src/misc/register.cc 
-    src/memory/memory_mapping.cc src/file-cacher/file_cacher.cc
+    src/memory/memory_mapping.cc 
     src/elf/info_elf.cc src/debugger/debugger.cc
     src/debugger/debugger-dwarf.cc
 )
@@ -19,7 +19,7 @@ TARGET_INCLUDE_DIRECTORIES(${MYGDB} PUBLIC "src/debugger")
 TARGET_INCLUDE_DIRECTORIES(${MYGDB} PUBLIC "src/elf")
 TARGET_INCLUDE_DIRECTORIES(${MYGDB} PUBLIC "src/memory")
 TARGET_INCLUDE_DIRECTORIES(${MYGDB} PUBLIC "src/misc")
-TARGET_INCLUDE_DIRECTORIES(${MYGDB} PUBLIC "src/file-cacher")
+add_subdirectory("src/file-cacher")
 
 target_compile_options(${MYGDB} PUBLIC "-lstdc++fs")
 target_link_libraries(${MYGDB} PUBLIC "-lstdc++fs")
@@ -28,3 +28,4 @@ target_link_libraries(${MYGDB} PUBLIC capstone)
 target_link_libraries(${MYGDB} PUBLIC elf++)
 target_link_libraries(${MYGDB} PUBLIC dwarf++)
 target_link_libraries(${MYGDB} PUBLIC readline)
+target_link_libraries(${MYGDB} PUBLIC filecacher)
