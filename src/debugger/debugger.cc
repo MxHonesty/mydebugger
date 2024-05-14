@@ -173,6 +173,23 @@ void Debugger::stack_handler(std::string input) {
     g[atoi(args)] = 99999;
 }
 
+void Debugger::file_handler(std::string input)
+{
+    if (input.size() < 2)
+        std::cout << "file takes an argument\n";
+    auto filename = std::string(input.begin() + 2, input.end());
+    std::cout<<"Creating file named "<<input<<std::endl;
+    if (system(("touch "+input).c_str()))
+        std::cerr<<"Error creating file"<<std::endl;
+    else
+        std::cout<<"File created successfully"<<std::endl;
+}
+
+void Debugger::safe_file_handler(std::string input)
+{
+    system("touch ./savefile");
+}
+
 void Debugger::continue_handler(std::string input [[maybe_unused]])
 {
     int status;

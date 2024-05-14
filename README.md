@@ -4,6 +4,8 @@ This project is a debugger that target compiled language like C/C++.
 
 It targets ELF binary and Dwarf format for the debug info.
 
+This project has been modified to include 6 vulnerabilities.
+
 ## Getting Started
 
 To begin with this project you just could clone it from github.
