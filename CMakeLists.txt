@@ -8,12 +8,14 @@ PROJECT(${MYGDB} CXX)
 ADD_EXECUTABLE(${MYGDB} src/main.cc src/misc/register.cc 
     src/memory/memory_mapping.cc src/file-cacher/file_cacher.cc
     src/elf/info_elf.cc src/debugger/debugger.cc
-    src/debugger/debugger-dwarf.cc
+    src/debugger/debugger-dwarf.cc src/analysis/engine.cc
+    src/analysis/external_engine.cc
 )
 
-add_compile_options("-std=c++17" "-pedantic" "-Wall" "-Wextra")
+add_compile_options("-std=c++17" "-pedantic" "-no-pie")
 
 TARGET_INCLUDE_DIRECTORIES(${MYGDB} PUBLIC "include")
+TARGET_INCLUDE_DIRECTORIES(${MYGDB} PUBLIC "src/analysis")
 TARGET_INCLUDE_DIRECTORIES(${MYGDB} PUBLIC "src/parser")
 TARGET_INCLUDE_DIRECTORIES(${MYGDB} PUBLIC "src/debugger")
 TARGET_INCLUDE_DIRECTORIES(${MYGDB} PUBLIC "src/elf")

@@ -33,7 +33,8 @@ class Debugger : public MemoryMapping
              {"h", &Debugger::help_handler},
              {"s", &Debugger::step_handler},
              {"l", &Debugger::get_current_code},
-             {"p", &Debugger::print_handler}});
+             {"p", &Debugger::print_handler},
+             {"a", &Debugger::analyze_handler}});
     }
     virtual void call_correct(const std::string& input);
     virtual void get_current_code(std::string input [[maybe_unused]])
@@ -47,6 +48,7 @@ class Debugger : public MemoryMapping
     void help_handler(std::string input);
     void print_handler(std::string input);
     void step_handler(std::string input);
+    void analyze_handler(std::string input);
 
   protected:
     uintptr_t resolve_addr(std::string value);
@@ -56,6 +58,10 @@ class Debugger : public MemoryMapping
     csh capstone_handle;
     std::map<std::string, decltype(&Debugger::bp_handler)> _input_handlers;
     // status
+
+  private:
+    std::vector<std::string> split(const std::string& str, char delim);
+
 };
 
 template <std::size_t N>

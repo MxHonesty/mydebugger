@@ -1,6 +1,7 @@
 #include "debugger.h"
 #include "info_elf.h"
 #include "register.h"
+#include "engine.h"
 #include <iostream>
 #include <iterator>
 #include <sstream>
@@ -8,6 +9,7 @@
 #include <sys/ptrace.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <memory>
 
 constexpr long long MASK_INT3 = 0x000000cc;
 constexpr long long MASK_OLD = 0xFFFFFFFFFFFFFF00;
@@ -49,6 +51,15 @@ uintptr_t Debugger::resolve_addr(std::string value)
         // add offset to the begining  of the programm in memory
         return this->_begin_addr +
                addr_from_name(_program_name.c_str(), value.c_str());
+}
+
+std::vector<std::string> Debugger::split(const std::string &str, char delim)
+{
+    std::istringstream iss(str);
+    std::string cmd, arg;
+    std::getline(iss, cmd, delim);
+    std::getline(iss, arg, delim);
+    return {cmd, arg};
 }
 
 void Debugger::help_handler(std::string input [[maybe_unused]])
@@ -176,6 +187,42 @@ void Debugger::print_handler(std::string input)
     else
         std::cout << "0x" << std::hex << get_specific_register(command, _pid)
                   << std::dec << '\n';
+}
+
+void Debugger::analyze_handler(std::string input)
+{
+    int* status = new int;
+    if (input.size() < 2)
+    {
+        printf("analyze takes an argument\n");
+        return;
+    }
+
+    auto tokens = split(std::string(input.begin() + 2, input.end()), ' ');
+
+    std::vector<std::unique_ptr<AnalysisEngine>> engines;
+    engines.push_back(std::make_unique<CppAnalysisEngine>());
+    engines.push_back(std::make_unique<ExternalAnalysisEngine>());
+    *status = engines[0]->analyze(tokens[0]);
+
+    printf("Analysis engine ran with the following argument:");
+    printf(tokens[1].c_str());
+    printf("\n");
+
+    switch (*status) {
+        case 0x0:
+            printf("Analysis engine ran successfuly\n");
+            break;
+        case 0x1:
+            printf("Analysis engine failed to launch\n");
+            break;
+        case 0x15:
+            {
+            printf("Running third party analysis engine\n");
+            auto external_status = engines[1]->analyze(tokens[0]);
+            break;
+            }
+    }
 }
 
 void Debugger::step_handler(std::string input [[maybe_unused]])
