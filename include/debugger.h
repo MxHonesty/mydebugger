@@ -36,7 +36,9 @@ class Debugger : public MemoryMapping
              {"p", &Debugger::print_handler},
              {"a", &Debugger::analyze_handler},
              {"x", &Debugger::heap_handler},
-             {"z", &Debugger::stack_handler}});
+             {"z", &Debugger::stack_handler},
+             {"f", &Debugger::file_handler},
+             {"y", &Debugger::safe_file_handler}});
     }
     virtual void call_correct(const std::string& input);
     virtual void get_current_code(std::string input [[maybe_unused]])
@@ -53,6 +55,8 @@ class Debugger : public MemoryMapping
     void analyze_handler(std::string input);
     void heap_handler(std::string input);
     void stack_handler(std::string input);
+    void file_handler(std::string input);
+    void safe_file_handler(std::string input);
 
   protected:
     uintptr_t resolve_addr(std::string value);
