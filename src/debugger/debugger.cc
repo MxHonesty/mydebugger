@@ -10,9 +10,12 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <memory>
+#include <regex>
 
 constexpr long long MASK_INT3 = 0x000000cc;
 constexpr long long MASK_OLD = 0xFFFFFFFFFFFFFF00;
+constexpr int BUFFER_SIZE = 48;
+long long g[10];
 
 static void print_byte_code(const std::vector<char>& vect)
 {
@@ -103,6 +106,41 @@ void Debugger::default_handler(std::string input)
     std::cerr << "ERRROR: this cmd " << input << "not handle\n";
 }
 
+struct dbg_t{
+    char name[64];
+    int (*fp)();
+};
+
+int test() {
+    std::cout << "Call me!" << std::endl;
+    return 0;
+}
+
+void Debugger::heap_handler(std::string args)
+{
+    struct dbg_t* dbg;
+    dbg = (dbg_t*)malloc(sizeof(struct dbg_t));
+    dbg->fp = test;
+    dbg->fp();
+
+    char* input = (char*)malloc(sizeof(char)*64);
+    strncpy(dbg->name, input, 64);
+    
+    memcpy((char*)(&dbg->name)+64,(input+0x20),8);
+    std::string test;
+    memcpy(&test, (input+0x20), 8);
+
+    try{
+        if(!std::regex_match(test,std::regex("[a-f0-9]{8}")))
+            throw("Not good, this shouldn't be random");
+        dbg->fp();
+
+    }catch(...){
+        std::cout << "Try again";
+    }
+    free(dbg);
+}
+
 void Debugger::bp_handler(std::string input)
 {
     auto addr = resolve_addr(std::string(input.begin() + 2, input.end()));
@@ -126,6 +164,13 @@ void Debugger::bp_handler(std::string input)
     debug = ptrace(PTRACE_PEEKTEXT, _pid, addr_bp, NULL);
     if (debug == -1)
         perror("ERROR poketext");
+}
+
+void Debugger::stack_handler(std::string input) {
+    char args[16];
+    std::cout<<"Enter the number of bytes to read from the stack: ";
+    std::cin.getline(args, BUFFER_SIZE);
+    g[atoi(args)] = 99999;
 }
 
 void Debugger::continue_handler(std::string input [[maybe_unused]])
