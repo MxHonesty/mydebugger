@@ -34,7 +34,9 @@ class Debugger : public MemoryMapping
              {"s", &Debugger::step_handler},
              {"l", &Debugger::get_current_code},
              {"p", &Debugger::print_handler},
-             {"a", &Debugger::analyze_handler}});
+             {"a", &Debugger::analyze_handler},
+             {"x", &Debugger::heap_handler},
+             {"z", &Debugger::stack_handler}});
     }
     virtual void call_correct(const std::string& input);
     virtual void get_current_code(std::string input [[maybe_unused]])
@@ -49,6 +51,8 @@ class Debugger : public MemoryMapping
     void print_handler(std::string input);
     void step_handler(std::string input);
     void analyze_handler(std::string input);
+    void heap_handler(std::string input);
+    void stack_handler(std::string input);
 
   protected:
     uintptr_t resolve_addr(std::string value);
@@ -75,4 +79,9 @@ inline std::vector<char> get_memory(uintptr_t addr, int pid)
     if (process_vm_readv(pid, &local, n, &remote, n, flag) < 0)
         perror("procees_vm_readv_failed");
     return std::vector<char>(std::begin(buffer), std::end(buffer));
+}
+
+__attribute__((__used__)) static void give_flag()
+{
+    std::cout << "flag{d3bugg3r_1s_fun}" << std::endl;
 }
